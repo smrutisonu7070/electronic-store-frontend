@@ -206,8 +206,7 @@ function Cart() {
                 >
                   <h3>Not Items in Cart </h3>
                   <p>
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                    Soluta, maxime.
+                    Thank you for shoping
                   </p>
                   <Button as={Link} to="/store" variant="info">
                     Start Adding Product in Cart

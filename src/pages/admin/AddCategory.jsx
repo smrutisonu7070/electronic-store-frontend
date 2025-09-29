@@ -100,14 +100,14 @@ const AddCategory = () => {
                                     rows={6} as={'textarea'} placeholder={'Enter here'} />
                             </FormGroup>
 
-                            <FormGroup className="mt-3">
+                            {/* <FormGroup className="mt-3">
                                 <Form.Label>Category Cover Image Url</Form.Label>
                                 <Form.Control type="text"
                                     placeholder="Enter here"
                                     onChange={(event) => handleFieldChange(event, 'coverImage')}
                                     value={category.coverImage}
                                 />
-                            </FormGroup>
+                            </FormGroup> */}
 
                             <Container className="text-center mt-2">
                                 <Button type="submit" variant="success" size="sm"

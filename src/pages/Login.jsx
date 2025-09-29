@@ -202,7 +202,7 @@ const Login = () => {
 
                                         </Button>
 
-                                        <Button onClick={handleReset} className="ms-2" variant="danger">Reset</Button>
+                                        {/* <Button onClick={handleReset} className="ms-2" variant="danger">Reset</Button> */}
                                     </Container>
 
                                 </Form>

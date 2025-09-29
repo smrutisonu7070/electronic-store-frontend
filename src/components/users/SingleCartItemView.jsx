@@ -35,7 +35,7 @@ const SingleCartItemView = ({ item }) => {
                     </Col>
                     <Col md={9}>
                         <h5>{item.product.title}</h5>
-                        <p className='text-muted'><span>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Pariatur, dolor.</span></p>
+                        <p className='text-muted'>{item.product.description}</p>
                         <Row>
                             <Col>
                                 <p > <b>{item.quantity}</b> <span className='text-muted'>Quantity</span></p>

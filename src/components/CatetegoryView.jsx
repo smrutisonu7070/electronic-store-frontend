@@ -15,9 +15,9 @@ const CategoryView = ({ category, deleteCat, viewCat, updateCat }) => {
             <Card className="border-bottom shadow-sm">
                 <Card.Body>
                     <Row className="align-items-center">
-                        <Col md={2} className="text-center">
+                        {/* <Col md={2} className="text-center">
                             <img src={(category.coverImage ? (category.coverImage.startsWith("http") ? category.coverImage : image) : image)} className="rounded-circle" style={imageStyle} alt="" />
-                        </Col>
+                        </Col> */}
 
                         <Col md={8}>
                             <h5>{category.title}</h5>

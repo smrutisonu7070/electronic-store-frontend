@@ -95,7 +95,7 @@ export const getProductsOfCategories = (
 ) => {
   return privateAxios
     .get(
-      `/categories/${categoryId}/products?pageNumber=${pageNumber}&pageSize=${pageSize}&sortBy=${sortBy}&sortDir=${sortDir}`
+      `/categories/${categoryId}/products/live?pageNumber=${pageNumber}&pageSize=${pageSize}&sortBy=${sortBy}&sortDir=${sortDir}`
     )
     .then((res) => res.data);
 };

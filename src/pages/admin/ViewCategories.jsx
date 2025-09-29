@@ -158,7 +158,7 @@ const ViewCategories = () => {
                     if (cat.categoryId === selectedCategory.categoryId) {
                         cat.title = data.title
                         cat.description = data.description
-                        cat.coverImage = data.coverImage
+                        // cat.coverImage = data.coverImage
                     }
 
                     return cat;
@@ -199,13 +199,13 @@ const ViewCategories = () => {
                         <Modal.Title>{selectedCategory.title}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Container>
+                        {/* <Container>
                             <img style={{
                                 width: '100%',
                                 height: '250px',
                                 objectFit: 'contain'
                             }} src={selectedCategory.coverImage} alt="" />
-                        </Container>
+                        </Container> */}
 
                         <div className="mt-3">
                             {selectedCategory.description}
@@ -265,7 +265,7 @@ const ViewCategories = () => {
                                 />
                             </FormGroup>
 
-                            <FormGroup>
+                            {/* <FormGroup>
                                 <Container className="py-3">
                                     <img
                                         src={selectedCategory.coverImage}
@@ -285,7 +285,7 @@ const ViewCategories = () => {
                                     })}
 
                                 />
-                            </FormGroup>
+                            </FormGroup> */}
 
                         </Form>
 

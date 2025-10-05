@@ -2,6 +2,7 @@ import { Button, Card, Col, Container, Form, Row, Spinner } from "react-bootstra
 import Base from "../components/Base"
 import logo from "../assets/logo.png"
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import { toast } from "react-toastify"
 import { registerUser } from "../services/user.service"
 const Register = () => {
@@ -64,29 +65,29 @@ const Register = () => {
         console.log(data)
 
         //validate client side 
-        if (data.name == undefined || data.name.trim() == '') {
+        if (data.name.trim() === '' || data.name.length < 3) {
             toast.error("Name is required !!")
             return
         }
 
-        if (data.email == undefined || data.email.trim() == '') {
+        if (data.email.trim() === '') {
             toast.error("Email is required !!")
             return
         }
 
         //basics...
 
-        if (data.password == undefined || data.password.trim() == '') {
+        if (data.password.trim() === '') {
             toast.error("Password is required !!")
             return
         }
 
-        if (data.confirmPassword == undefined || data.confirmPassword.trim() == '') {
+        if (data.confirmPassword === undefined || data.confirmPassword.trim() === '') {
             toast.error("Confirm Password is required !!")
             return
         }
 
-        if (data.password != data.confirmPassword) {
+        if (data.password !== data.confirmPassword) {
             toast.error("Password and Confirm password not matched !!")
             return
         }
@@ -269,7 +270,9 @@ const Register = () => {
 
 
                                     <Container>
-                                        <p className="text-center">Already register !   <a href="">Login </a></p>
+                                        <p className="text-center">
+                                            Already registered? <Link to="/login" className="text-decoration-none">Login here</Link>
+                                        </p>
                                     </Container>
 
                                     <Container className="text-center">

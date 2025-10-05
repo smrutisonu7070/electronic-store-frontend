@@ -1,0 +1,308 @@
+import React, { useState, useEffect } from 'react';
+import { Container, Table, Button, Modal, Form, Row, Col, Alert, Badge, Card } from 'react-bootstrap';
+import { privateAxios } from '../../services/axios.service';
+import { toast } from 'react-toastify';
+import { initializeInventory } from '../../services/admin.service';
+
+const AdminInventory = () => {
+  const [inventory, setInventory] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [isInitializing, setIsInitializing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState({
+    productId: '',
+    currentStock: 0,
+    lowStockThreshold: 5,
+    reorderPoint: 10,
+    sku: '',
+    location: ''
+  });
+  const [bulkUpdateMode, setBulkUpdateMode] = useState(false);
+  const [bulkItems, setBulkItems] = useState([]);
+
+  useEffect(() => {
+    fetchInventory();
+  }, []);
+
+  const fetchInventory = async () => {
+    try {
+      const response = await privateAxios.get('/inventory');
+      setInventory(response.data.content);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching inventory:', error);
+      toast.error('Failed to fetch inventory data');
+      setLoading(false);
+    }
+  };
+
+  const handleInitializeInventory = async () => {
+    try {
+      setIsInitializing(true);
+      await initializeInventory();
+      toast.success('Successfully initialized inventory for all products');
+      
+      // Fetch updated inventory and low stock data
+      await fetchInventory();
+      const response = await privateAxios.get('/inventory/low-stock');
+      const lowStockData = response.data.content;
+      
+      // Show summary notification
+      toast.info(`Found ${lowStockData.filter(item => item.quantity > 0).length} low stock items and ${lowStockData.filter(item => item.quantity === 0).length} out of stock items`);
+    } catch (error) {
+      console.error('Error initializing inventory:', error);
+      toast.error('Failed to initialize inventory: ' + (error.response?.data?.message || 'Unknown error'));
+    } finally {
+      setIsInitializing(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (selectedItem) {
+        await privateAxios.put('/inventory/' + selectedItem.id, formData);
+        toast.success('Inventory updated successfully');
+      } else {
+        await privateAxios.post('/inventory', formData);
+        toast.success('Inventory item added successfully');
+      }
+      setShowModal(false);
+      fetchInventory();
+    } catch (error) {
+      console.error('Error saving inventory:', error);
+      toast.error('Failed to save inventory data');
+    }
+  };
+
+  const handleEdit = (item) => {
+    setSelectedItem(item);
+    setFormData({
+      productId: item.productId,
+      currentStock: item.currentStock,
+      lowStockThreshold: item.lowStockThreshold,
+      reorderPoint: item.reorderPoint,
+      sku: item.sku,
+      location: item.location
+    });
+    setShowModal(true);
+  };
+
+  if (loading) {
+    return (
+      <Container className="text-center mt-5">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </Container>
+    );
+  }
+
+  return (
+    <Container fluid>
+      {/* Initialize Inventory Section */}
+      <Row className="mb-4">
+        <Col>
+          <Card>
+            <Card.Body>
+              <div className="d-flex justify-content-between align-items-center">
+                <h2>Inventory Management</h2>
+                <div className="d-flex gap-2">
+                  <Button 
+                    onClick={handleInitializeInventory} 
+                    disabled={isInitializing}
+                    variant="success"
+                  >
+                    {isInitializing ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Initializing...
+                      </>
+                    ) : (
+                      'Initialize All Products'
+                    )}
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setSelectedItem(null);
+                      setFormData({
+                        productId: '',
+                        currentStock: 0,
+                        lowStockThreshold: 5,
+                        reorderPoint: 10,
+                        sku: '',
+                        location: ''
+                      });
+                      setShowModal(true);
+                    }}
+                    variant="primary"
+                  >
+                    Add New Item
+                  </Button>
+                  <Button 
+                    variant="secondary"
+                    onClick={() => setBulkUpdateMode(!bulkUpdateMode)}
+                  >
+                    {bulkUpdateMode ? 'Cancel Bulk Update' : 'Bulk Update'}
+                  </Button>
+                </div>
+              </div>
+
+              <Alert variant="info" className="mt-3">
+                <Alert.Heading>Initialize Products Inventory</Alert.Heading>
+                <p>
+                  Click "Initialize All Products" to:
+                </p>
+                <ul>
+                  <li>Create inventory records for all existing products</li>
+                  <li>Set default stock thresholds (Low stock: 5, Reorder point: 10)</li>
+                  <li>Sync current product quantities with inventory</li>
+                </ul>
+                <p className="mb-0">
+                  <strong>Note:</strong> This action will only create inventory records for products that don't already have one.
+                </p>
+              </Alert>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Inventory Table Section */}
+      <Row>
+        <Col>
+          <Card>
+            <Card.Body>
+              <Table striped bordered hover responsive>
+                <thead>
+                  <tr>
+                    <th>SKU</th>
+                    <th>Product ID</th>
+                    <th>Stock Status</th>
+                    <th>Current Stock</th>
+                    <th>Low Stock Threshold</th>
+                    <th>Reorder Point</th>
+                    <th>Location</th>
+                    <th>Last Updated</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inventory.map(item => (
+                    <tr key={item.id}>
+                      <td>{item.sku}</td>
+                      <td>{item.productId}</td>
+                      <td>
+                        <Badge bg={
+                          item.currentStock === 0 ? 'danger' :
+                          item.currentStock <= item.lowStockThreshold ? 'warning' :
+                          'success'
+                        }>
+                          {item.currentStock === 0 ? 'Out of Stock' :
+                           item.currentStock <= item.lowStockThreshold ? 'Low Stock' :
+                           'In Stock'}
+                        </Badge>
+                      </td>
+                      <td>{item.currentStock}</td>
+                      <td>{item.lowStockThreshold}</td>
+                      <td>{item.reorderPoint}</td>
+                      <td>{item.location}</td>
+                      <td>{new Date(item.lastUpdated).toLocaleString()}</td>
+                      <td>
+                        <Button variant="primary" size="sm" onClick={() => handleEdit(item)} className="me-2">
+                          Edit
+                        </Button>
+                        <Button 
+                          variant={item.currentStock === 0 ? "danger" : "warning"} 
+                          size="sm" 
+                          onClick={() => handleEdit({ ...item, currentStock: item.reorderPoint })}
+                        >
+                          Restock
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Edit Modal */}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{selectedItem ? 'Edit Inventory' : 'Add Inventory'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>Product ID</Form.Label>
+              <Form.Control
+                type="text"
+                name="productId"
+                value={formData.productId}
+                onChange={(e) => setFormData({...formData, productId: e.target.value})}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Current Stock</Form.Label>
+              <Form.Control
+                type="number"
+                name="currentStock"
+                value={formData.currentStock}
+                onChange={(e) => setFormData({...formData, currentStock: parseInt(e.target.value)})}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Low Stock Threshold</Form.Label>
+              <Form.Control
+                type="number"
+                name="lowStockThreshold"
+                value={formData.lowStockThreshold}
+                onChange={(e) => setFormData({...formData, lowStockThreshold: parseInt(e.target.value)})}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Reorder Point</Form.Label>
+              <Form.Control
+                type="number"
+                name="reorderPoint"
+                value={formData.reorderPoint}
+                onChange={(e) => setFormData({...formData, reorderPoint: parseInt(e.target.value)})}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Location</Form.Label>
+              <Form.Control
+                type="text"
+                name="location"
+                value={formData.location}
+                onChange={(e) => setFormData({...formData, location: e.target.value})}
+              />
+            </Form.Group>
+
+            <div className="text-end">
+              <Button variant="secondary" onClick={() => setShowModal(false)} className="me-2">
+                Cancel
+              </Button>
+              <Button variant="primary" type="submit">
+                {selectedItem ? 'Update' : 'Add'}
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
+    </Container>
+  );
+};
+
+export default AdminInventory;

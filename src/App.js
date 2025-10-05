@@ -24,15 +24,22 @@ import AddCategory from "./pages/admin/AddCategory";
 import ViewCategories from "./pages/admin/ViewCategories";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminInventory from "./pages/admin/AdminInventory";
+import AdminReturns from "./pages/admin/AdminReturns";
+import AdminCoupons from "./pages/admin/AdminCoupons";
 import StorePage from "./pages/users/StorePage";
 import ProductView from "./pages/users/ProductView";
 import CategoryStorePage from "./pages/users/CategoryStorePage";
 import CartProvider from "./context/CartProvider";
 import Loading from "./components/Loading";
+import PaymentPage from "./pages/users/PaymentPage";
+import Wishlist from "./pages/users/Wishlist";
 import { useEffect, useState } from "react";
 import { privateAxios } from "./services/axios.service";
 import Swal from "sweetalert2";
 import useLoader from "./hooks/useLoader";
+import SavedItems from "./components/shopping/SavedItems";
 function App() {
   const loading = useLoader();
 
@@ -54,27 +61,33 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/store" element={<StorePage />} />
+            <Route path="/payment" element={<PaymentPage />} />
             <Route path="store/products/:productId" element={<ProductView />} />
             <Route
               path="store/:categoryId/:categoryTitle"
               element={<CategoryStorePage />}
             />
 
-            <Route path="/users" element={<Dashboard />}>
+            <Route path="/users/*" element={<Dashboard />}>
               <Route path="home" element={<Index />} />
               <Route path="profile/:userId" element={<Profile />} />
               <Route path="about" element={<AboutUser />} />
               <Route path="orders" element={<Order />} />
+              <Route path="wishlist" element={<Wishlist />} />
+              <Route path="saved-items" element={<SavedItems />} />
             </Route>
-
             <Route path="/admin" element={<AdminDashboard />}>
               <Route path="home" element={<AdminHome />} />
+              <Route path="analytics" element={<AdminAnalytics />} />
               <Route path="add-product" element={<AddProduct />} />
               <Route path="add-category" element={<AddCategory />} />
               <Route path="categories" element={<ViewCategories />} />
               <Route path="products" element={<ViewProducts />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route path="inventory" element={<AdminInventory />} />
+              <Route path="returns" element={<AdminReturns />} />
+              <Route path="coupons" element={<AdminCoupons />} />
             </Route>
           </Routes>
         </BrowserRouter>

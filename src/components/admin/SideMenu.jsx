@@ -1,13 +1,12 @@
 import { ListGroup, Badge } from "react-bootstrap"
 import { NavLink } from "react-router-dom"
 import { GrHome } from 'react-icons/gr'
-import { BiCategory } from 'react-icons/bi'
-import { MdOutlineCategory } from 'react-icons/md'
+import { BiCategory, BiSupport } from 'react-icons/bi'
+import { MdOutlineCategory, MdDashboard, MdAnalytics } from 'react-icons/md'
 import { MdAddBox } from 'react-icons/md'
 import { MdViewDay } from 'react-icons/md'
-import { FaOpencart } from 'react-icons/fa'
-import { FaUserSecret } from 'react-icons/fa'
-import { MdDashboard } from 'react-icons/md'
+import { FaOpencart, FaUserSecret, FaBoxOpen, FaGift } from 'react-icons/fa'
+import { TbDiscount } from 'react-icons/tb'
 import { HiOutlineLogout } from 'react-icons/hi'
 import { useContext } from "react"
 import UserContext from '../../context/UserContext'

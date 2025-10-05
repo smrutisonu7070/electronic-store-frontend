@@ -20,8 +20,8 @@ const AddProduct = () => {
   const [product, setProduct] = useState({
     title: "",
     description: "",
-    price: 0,
-    discountedPrice: 0,
+    price: "",
+    discountedPrice: "",
     quantity: 1,
     live: false,
     stock: true,
@@ -70,12 +70,11 @@ const AddProduct = () => {
   };
 
   const clearForm = () => {
-    
     setProduct({
       title: "",
       description: "",
-      price: 0,
-      discountedPrice: 0,
+      price: "",
+      discountedPrice: "",
       quantity: 1,
       live: false,
       stock: true,
@@ -101,16 +100,17 @@ const AddProduct = () => {
       return;
     }
 
-    if (product.price <= 0) {
+    if (!product.price || Number(product.price) <= 0) {
       toast.error("Invalid Price !!");
       return;
     }
 
     if (
-      product.discountedPrice <= 0 ||
-      product.discountedPrice >= product.price
+      !product.discountedPrice ||
+      Number(product.discountedPrice) <= 0 ||
+      Number(product.discountedPrice) >= Number(product.price)
     ) {
-      toast.error("Invalid discounted priced !!");
+      toast.error("Invalid discounted price !!");
       return;
     }
 
@@ -136,7 +136,11 @@ const AddProduct = () => {
             })
             .catch((error) => {
               console.log(error);
-              toast.error("Error in uploading image");
+              if (error.response && error.response.status !== 200) {
+                toast.error("Error in uploading image");
+              } else {
+                clearForm();
+              }
             });
         })
         .catch((error) => {
@@ -163,7 +167,11 @@ const AddProduct = () => {
             })
             .catch((error) => {
               console.log(error);
-              toast.error("Error in uploading image");
+              if (error.response && error.response.status !== 200) {
+                toast.error("Error in uploading image");
+              } else {
+                clearForm();
+              }
             });
         })
         .catch((error) => {
@@ -246,13 +254,14 @@ const AddProduct = () => {
                       placeholder="Enter here"
                       value={product.discountedPrice}
                       onChange={(event) => {
-                        if (event.target.value > product.price) {
+                        const newValue = Number(event.target.value);
+                        if (newValue > Number(product.price)) {
                           toast.error("Invalid Discount value !!");
                           return;
                         }
                         setProduct({
                           ...product,
-                          discountedPrice: event.target.value,
+                          discountedPrice: newValue,
                         });
                       }}
                     />

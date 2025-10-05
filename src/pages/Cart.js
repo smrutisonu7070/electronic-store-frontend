@@ -8,16 +8,18 @@ import {
   Row,
 } from "react-bootstrap";
 import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import CartContext from "../context/CartContext";
 import UserContext from "../context/UserContext";
 import SingleCartItemView from "../components/users/SingleCartItemView";
-import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { privateAxios } from "../services/axios.service";
 import { createOrder } from "../services/OrderService";
 import { ORDER_STATUS, PAYMENT_STATUS } from "../services/helper.service";
 import useJwtTokenExpiration from "../hooks/useJwtTokenExpiration";
 
 function Cart() {
+  const navigate = useNavigate();
   const flag = useJwtTokenExpiration();
   const [orderPlacedClicked, setOrderPlacedClicked] = useState(false);
   const { cart, setCart, addItem, removeItem, clearCart } =
@@ -73,16 +75,44 @@ function Cart() {
     console.log(orderDetails);
 
     try {
+      // Check if cart is empty
+      if (!cart.items || cart.items.length === 0) {
+        toast.error("Your cart is empty!");
+        return;
+      }
+
+      // Check stock availability for all items
+      for (const item of cart.items) {
+        try {
+          const response = await privateAxios.get(`/inventory/product/${item.product.productId}`);
+          const inventory = response.data;
+          if (inventory.currentStock < item.quantity) {
+            toast.error(`Not enough stock for ${item.product.title}! Available: ${inventory.currentStock}`);
+            return;
+          }
+        } catch (error) {
+          console.error(`Error checking inventory for product ${item.product.productId}:`, error);
+          toast.error(`Unable to verify stock for ${item.product.title}`);
+          return;
+        }
+      }
+
+      console.log("Sending order details:", orderDetails);
       const result = await createOrder(orderDetails);
-      console.log(result);
-      toast.success("Order created !! proceeding for payment");
+      console.log("Order creation response:", result);
+      toast.success("Order created! Proceeding to payment");
+      navigate("/payment", { state: result });
       setCart({
         ...cart,
         items: [],
       });
     } catch (error) {
-      console.log(error);
-      toast.error("Error in creating order ! Try again");
+      console.error("Order creation error:", error);
+      const errorMessage = error.response?.data?.message || "Error in creating order!";
+      toast.error(errorMessage);
+      if (error.response?.status === 400) {
+        console.error("Bad request details:", error.response.data);
+      }
     }
   };
 

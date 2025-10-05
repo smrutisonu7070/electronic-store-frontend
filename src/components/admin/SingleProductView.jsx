@@ -1,7 +1,8 @@
-import { Button, Modal } from "react-bootstrap"
+import { Button, Modal, Badge, OverlayTrigger, Tooltip } from "react-bootstrap"
 import { MdDelete } from 'react-icons/md'
 import { GrFormView } from 'react-icons/gr'
 import { BsFillPencilFill } from 'react-icons/bs'
+import { BiPackage } from 'react-icons/bi'
 import Swal from "sweetalert2"
 import { toast } from "react-toastify"
 import { deleteProduct } from "../../services/product.service"
@@ -35,6 +36,82 @@ const SingleProductView = ({
         } else {
 
         }
+    }
+
+    // Quick stock update
+    const handleQuickStockUpdate = (product) => {
+        Swal.fire({
+            title: 'Update Stock',
+            html: `
+                <div class="form-group">
+                    <label>Current Stock: ${product.quantity}</label>
+                    <input 
+                        type="number" 
+                        id="stockQuantity" 
+                        class="form-control mt-2" 
+                        value="${product.quantity}"
+                        min="0"
+                    >
+                    <div class="mt-3">
+                        <label>Operation:</label>
+                        <select id="stockOperation" class="form-control">
+                            <option value="set">Set to</option>
+                            <option value="add">Add</option>
+                            <option value="remove">Remove</option>
+                        </select>
+                    </div>
+                    <div class="text-muted mt-2 small">
+                        Low stock threshold: ${product.lowStockThreshold || 10}<br>
+                        Reorder point: ${product.reorderPoint || 20}
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Update',
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                const newQuantity = parseInt(document.getElementById('stockQuantity').value);
+                const operation = document.getElementById('stockOperation').value;
+                let quantity;
+                
+                switch(operation) {
+                    case 'set':
+                        quantity = newQuantity - product.quantity; // Calculate difference
+                        break;
+                    case 'add':
+                        quantity = newQuantity;
+                        break;
+                    case 'remove':
+                        quantity = -newQuantity;
+                        break;
+                }
+                
+                return fetch(`/inventory/product/${product.productId}/stock?quantity=${quantity}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+                    return response.json()
+                })
+                .catch(error => {
+                    Swal.showValidationMessage(
+                        `Request failed: ${error}`
+                    )
+                })
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                toast.success('Stock updated successfully');
+                // Update product list to reflect changes
+                updateProductList(product.productId);
+            }
+        })
     }
 
     //deleteProduct
@@ -76,24 +153,49 @@ const SingleProductView = ({
         <tr className={getBackgroundForProduct()}>
             <td className="px-3 small"> {index + 1}</td>
             <td className="px-3 small" >{product.title}</td>
-            <td className="px-3 small">{product.quantity}</td>
+            <td className="px-3 small">
+                <Badge bg={product.quantity > 10 ? 'success' : product.quantity > 0 ? 'warning' : 'danger'}>
+                    {product.quantity}
+                </Badge>
+                {product.quantity <= 5 && product.quantity > 0 && (
+                    <Badge bg="warning" className="ms-2">Low Stock</Badge>
+                )}
+                {product.quantity === 0 && (
+                    <Badge bg="danger" className="ms-2">Out of Stock</Badge>
+                )}
+            </td>
             <td className="px-3 small">{product.price}₹</td>
             <td className="px-3 small">{product.discountedPrice}₹</td>
-            <td className={`px-3 small `}>  {product.live ? 'True' : 'False'}</td>
-            <td className="px-3 small ">{product.stock ? 'True' : 'False'}</td>
+            <td className={`px-3 small `}>
+                <Badge bg={product.live ? 'success' : 'danger'}>
+                    {product.live ? 'Active' : 'Inactive'}
+                </Badge>
+            </td>
+            <td className="px-3 small">
+                <Badge bg={product.stock ? 'success' : 'danger'}>
+                    {product.stock ? 'In Stock' : 'Out of Stock'}
+                </Badge>
+            </td>
             <td className="px-3 small" >{product.category ? product.category.title : ' '}</td>
             <td className="px-3 small">{formatDate(product.addedDate)} </td>
             <td className={`px-3 small d-flex table-light `}>
+                <OverlayTrigger
+                    placement="top"
+                    overlay={<Tooltip>Quick Stock Update</Tooltip>}
+                >
+                    <Button className="me-2" variant="info" onClick={(event) => handleQuickStockUpdate(product)} size="sm">
+                        <BiPackage />
+                    </Button>
+                </OverlayTrigger>
 
-                {/* delete button */}
                 <Button variant="danger" onClick={(event) => deleteProductLocal(product.productId)} size="sm">
                     <MdDelete />
                 </Button>
-                {/* view button */}
+
                 <Button className="ms-2" onClick={(event) => openProductViewModal(event, product)} variant="warning" size="sm">
                     <GrFormView />
                 </Button>
-                {/* update button */}
+
                 <Button onClick={(event) => openEditProductModel(event, product)} className="ms-2" variant="dark" size="sm">
                     <BsFillPencilFill />
                 </Button>

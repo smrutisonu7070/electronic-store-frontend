@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
-import { Container, Spinner, Modal, Button, Form, FormGroup } from "react-bootstrap"
+import { Container, Spinner, Modal, Button, Form, FormGroup, Row, Col } from "react-bootstrap"
 import InfiniteScroll from "react-infinite-scroll-component"
 import { toast } from "react-toastify"
 import Swal from "sweetalert2"
+import "../../styles/AdminStyles.css"
 import CategoryView from "../../components/CatetegoryView"
 import { deleteCategory, getCategories, updateCategory } from "../../services/CategoryService"
 const ViewCategories = () => {

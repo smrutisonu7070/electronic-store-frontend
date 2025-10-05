@@ -1,22 +1,19 @@
 import {
-  Card,
   Col,
   Container,
   Row,
-  Badge,
   Button,
-  Form,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import defaultProductImage from "../assets/default_product_image.jpg";
 import SingleProductCard from "../components/users/SingleProductCard";
+
 export const trendingProducts = (products) => {
   return (
     <Container>
       <Row>
-        <h3 className="text-center">Trending Products List</h3>
+        <h3 className="text-center mb-4">Trending Products</h3>
         {products.map((product) => (
-          <Col md={4}>
+          <Col md={4} key={product.productId} className="mb-4">
             <SingleProductCard product={product} />
           </Col>
         ))}
@@ -25,72 +22,66 @@ export const trendingProducts = (products) => {
   );
 };
 
-export const infoWithImageInRightSection = (image, title, text) => {
+export const infoWithImageInRightSection = (image, title, text, buttonText = "Learn More", buttonLink = "/store") => {
   return (
     <Container>
-      <Row>
-        <Col style={{}} className="text-center">
-          <h3>{title}</h3>
-          <p>{text}</p>
-          <Button>Store </Button>
-        </Col>
-
-        <Col className="text-center">
-          <img src={image} alt="" />
-        </Col>
-      </Row>
-    </Container>
-  );
-};
-
-export const infoWithImageInLeftSection = (image, title, text) => {
-  return (
-    <Container>
-      <Row>
-        <Col style={{}} className="text-center">
-          <img src={image} alt="" />
-        </Col>
-
-        <Col className="text-center">
-          <h3>{title}</h3>
-          <p>{text}</p>
-          <Button>Store </Button>
-        </Col>
-      </Row>
-    </Container>
-  );
-};
-
-export const contactForm = () => {
-  return (
-    <Container>
-      <Card>
-        <Card.Body>
-          <div className="text-center">
-            <h3>Contact Us</h3>
+      <Row className="align-items-center">
+        <Col md={6} className="text-center text-md-start mb-4 mb-md-0">
+          <div>
+            <h3 className="fw-bold mb-3">{title}</h3>
+            <p className="lead mb-4">{text}</p>
+            <Link to={buttonLink}>
+              <Button variant="primary" size="lg" className="rounded-pill px-4">
+                {buttonText} <i className="fas fa-arrow-right ms-2"></i>
+              </Button>
+            </Link>
           </div>
-          <Form>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Email address</Form.Label>
-              <Form.Control type="email" placeholder="Enter email" />
-              <Form.Text className="text-muted">
-                We'll never share your email with anyone else.
-              </Form.Text>
-            </Form.Group>
+        </Col>
+        <Col md={6} className="text-center">
+          <img 
+            src={image} 
+            alt={title}
+            className="img-fluid rounded shadow-lg" 
+            style={{ 
+              maxWidth: '100%',
+              height: 'auto',
+              transition: 'transform 0.3s ease'
+            }}
+          />
+        </Col>
+      </Row>
+    </Container>
+  );
+};
 
-            <Form.Group className="mb-3" controlId="formBasicPassword">
-              <Form.Label>Password</Form.Label>
-              <Form.Control type="password" placeholder="Password" />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicCheckbox">
-              <Form.Check type="checkbox" label="Check me out" />
-            </Form.Group>
-            <Button variant="primary" type="submit">
-              Submit
-            </Button>
-          </Form>
-        </Card.Body>
-      </Card>
+export const infoWithImageInLeftSection = (image, title, text, buttonText = "Learn More", buttonLink = "/store") => {
+  return (
+    <Container>
+      <Row className="align-items-center">
+        <Col md={6} className="text-center">
+          <img 
+            src={image} 
+            alt={title}
+            className="img-fluid rounded shadow-lg" 
+            style={{ 
+              maxWidth: '100%',
+              height: 'auto',
+              transition: 'transform 0.3s ease'
+            }}
+          />
+        </Col>
+        <Col md={6} className="text-center text-md-start mb-4 mb-md-0">
+          <div>
+            <h3 className="fw-bold mb-3">{title}</h3>
+            <p className="lead mb-4">{text}</p>
+            <Link to={buttonLink}>
+              <Button variant="primary" size="lg" className="rounded-pill px-4">
+                {buttonText} <i className="fas fa-arrow-right ms-2"></i>
+              </Button>
+            </Link>
+          </div>
+        </Col>
+      </Row>
     </Container>
   );
 };

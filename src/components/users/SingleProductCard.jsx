@@ -22,13 +22,31 @@ const SingleProductCard = ({ product }) => {
                 <h6>{product.title}</h6>
                 <p className='text-muted'>{product.description}</p>
                 <Badge pill bg='info'>{product.category?.title}</Badge>
-                <Badge className='ms-2' pill bg={product.stock ? 'success' : 'danger'}>{product.stock ? 'In Stock' : " Out of Stock"}</Badge>
+                {product.quantity > 0 ? (
+                    <Badge className='ms-2' pill bg={product.quantity > 10 ? 'success' : 'warning'}>
+                        {product.quantity > 10 ? 'In Stock' : `Only ${product.quantity} left`}
+                    </Badge>
+                ) : (
+                    <Badge className='ms-2' pill bg='danger'>Out of Stock</Badge>
+                )}
                 <Container className='text-end'>
                     <b><span className='h3 text-muted'><s>₹{product.price}</s></span></b>
                     <b><span className='h4  ms-2'>₹{product.discountedPrice}</span></b>
                 </Container>
                 <Container className='d-grid mt-4'>
-                    <Button as={Link} to={`/store/products/${product.productId}`} variant='success' size={'sm'}>View Product</Button>
+                    <Button 
+                        as={Link} 
+                        to={`/store/products/${product.productId}`} 
+                        variant={product.quantity > 0 ? 'success' : 'secondary'} 
+                        size={'sm'}
+                    >
+                        {product.quantity > 0 ? 'View Product' : 'Out of Stock'}
+                    </Button>
+                    {product.quantity === 0 && (
+                        <small className='text-muted text-center mt-2'>
+                            Subscribe for stock notifications on product page
+                        </small>
+                    )}
                 </Container>
             </Card.Body>
         </Card>

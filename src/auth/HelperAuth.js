@@ -43,7 +43,7 @@ export const isAdminUser = () => {
   if (isLoggedIn()) {
     const user = getUserFromLocalStorage();
     const roles = user.roles;
-    if (roles.find((role) => role.roleId == "wetrsdfwetwfasfwdf")) {
+    if (roles.find((role) => role.roleName === "ROLE_ADMIN")) {
       return true;
     } else {
       return false;

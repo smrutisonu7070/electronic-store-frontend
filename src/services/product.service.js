@@ -20,7 +20,11 @@ export const addProductImage = (file, productId) => {
   const formData = new FormData();
   formData.append("productImage", file);
   return privateAxios
-    .post(`/products/image/${productId}`, formData)
+    .post(`/products/image/${productId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
     .then((response) => response.data);
 };
 
@@ -63,7 +67,11 @@ export const deleteProduct = (productId) => {
 export const updateProduct = (product, productId) => {
   return privateAxios
     .put(`/products/${productId}`, product)
-    .then((response) => response.data);
+    .then((response) => response.data)
+    .catch(error => {
+      console.error('Error updating product:', error.response?.data || error.message);
+      throw error;
+    });
 };
 
 //update the category of the product

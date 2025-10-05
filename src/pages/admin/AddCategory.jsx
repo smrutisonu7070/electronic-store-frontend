@@ -1,8 +1,8 @@
-import { clear } from "@testing-library/user-event/dist/clear"
 import { useState } from "react"
 import { Button, Card, Container, Form, FormGroup, Spinner } from "react-bootstrap"
 import { toast } from "react-toastify"
 import { addCategory } from "../../services/CategoryService"
+import "../../styles/AdminStyles.css"
 
 const AddCategory = () => {
 
@@ -51,8 +51,7 @@ const AddCategory = () => {
                 console.log(error)
                 toast.error("Error in adding category !! ")
             })
-            .
-            finally(() => {
+            .finally(() => {
                 setLoading(false)
             })
     }
@@ -69,35 +68,40 @@ const AddCategory = () => {
 
     return (
         <>
-            <Container fluid>
+            <Container fluid className="admin-container">
+                <div className="admin-form-container">
+                    <Card className="admin-card">
+                        <Card.Header className="admin-card-header">
+                            <h4 className="admin-section-title m-0">Add New Category</h4>
+                        </Card.Header>
 
+                        <Card.Body className="admin-card-body p-4">
+                            <Form onSubmit={handleFormSubmit}>
+                                <FormGroup className="mb-4">
+                                    <Form.Label className="admin-form-label">
+                                        <i className="fas fa-tag me-2"></i>Category Title
+                                    </Form.Label>
+                                    <Form.Control 
+                                        type="text"
+                                        className="admin-form-control"
+                                        placeholder="Enter a descriptive category title"
+                                        onChange={(event) => handleFieldChange(event, 'title')}
+                                        value={category.title}
+                                    />
+                                </FormGroup>
 
-                <Card className="border border-2 shadow-sm">
-
-                    {/* {JSON.stringify(category)} */}
-
-                    <Card.Body>
-
-                        <h5>Add Category Here </h5>
-
-                        <Form onSubmit={handleFormSubmit}>
-
-                            <FormGroup className="mt-3">
-                                <Form.Label>Category Title</Form.Label>
-
-                                <Form.Control type="text"
-                                    placeholder="Enter here"
-                                    onChange={(event) => handleFieldChange(event, 'title')}
-                                    value={category.title}
-                                />
-                            </FormGroup>
-
-                            <FormGroup className="mt-3">
-                                <Form.Label>Category Description</Form.Label>
-                                <Form.Control
-                                    onChange={(event) => handleFieldChange(event, 'description')}
-                                    value={category.description}
-                                    rows={6} as={'textarea'} placeholder={'Enter here'} />
+                                <FormGroup className="mb-4">
+                                    <Form.Label className="admin-form-label">
+                                        <i className="fas fa-align-left me-2"></i>Category Description
+                                    </Form.Label>
+                                    <Form.Control
+                                        as="textarea"
+                                        className="admin-form-control"
+                                        placeholder="Write a detailed description of the category"
+                                        onChange={(event) => handleFieldChange(event, 'description')}
+                                        value={category.description}
+                                        rows={6}
+                                    />
                             </FormGroup>
 
                             {/* <FormGroup className="mt-3">
@@ -109,32 +113,42 @@ const AddCategory = () => {
                                 />
                             </FormGroup> */}
 
-                            <Container className="text-center mt-2">
-                                <Button type="submit" variant="success" size="sm"
+                            <div className="admin-button-group">
+                                <Button 
+                                    type="submit" 
+                                    className="admin-button admin-button-primary"
                                     disabled={loading}
-
                                 >
-
-                                    <Spinner
-                                        variant={'border'}
-                                        size={'sm'}
-                                        className='me-2'
-                                        hidden={!loading}
-                                    />
-
-                                    <span hidden={!loading}>Please wait..</span>
-                                    <span hidden={loading}>    Add Category</span>
-
+                                    {loading ? (
+                                        <>
+                                            <Spinner
+                                                variant={'border'}
+                                                size={'sm'}
+                                                className='me-2'
+                                            />
+                                            <span>Processing...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fas fa-plus-circle"></i>
+                                            <span>Add Category</span>
+                                        </>
+                                    )}
                                 </Button>
-                                <Button variant="danger" onClick={clearForm} className="ms-2" size="sm">Clear</Button>
-                            </Container>
+                                <Button 
+                                    onClick={clearForm} 
+                                    className="admin-button admin-button-secondary"
+                                >
+                                    <i className="fas fa-undo"></i>
+                                    <span>Reset Form</span>
+                                </Button>
+                            </div>
 
                         </Form>
 
                     </Card.Body>
                 </Card>
-
-
+                </div>
             </Container>
         </>
     )

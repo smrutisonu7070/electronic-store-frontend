@@ -4,11 +4,12 @@ import UserContext from '../../context/UserContext'
 import { useEffect } from "react"
 import { useState } from "react"
 import { toast } from "react-toastify"
+import { useLocation } from "react-router-dom"
 import SingleOrderView from "../../components/SingleOrderView"
 import { Card, Col, Container, Row, Modal, Button, Table, ListGroup, Badge, Form, Alert } from "react-bootstrap"
 import { formatDate, getProductImageUrl } from "../../services/helper.service"
 const Order = () => {
-
+    const location = useLocation();
     const { userData, isLogin } = useContext(UserContext)
     const [orders, setOrders] = useState([])
     const [selectedOrder, setSelectedOrder] = useState(null)
@@ -16,6 +17,13 @@ const Order = () => {
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+
+    // Refresh orders when navigating back from payment
+    useEffect(() => {
+        if (isLogin && location.pathname === '/users/orders') {
+            loadOrderOfUsers();
+        }
+    }, [location, isLogin]);
 
     const openViewOrderModal = (event, order) => {
         console.log("view order button clicked ")

@@ -3,19 +3,22 @@ import { Table } from 'react-bootstrap'
 const ShowHtml = ({ htmlText }) => {
 
     const changeHtmlData = () => {
-        return parse(htmlText, {
+        // First remove unnecessary p tags if the text is wrapped in them
+        const cleanText = htmlText.replace(/^<p>(.*)<\/p>$/, '$1');
+        
+        return parse(cleanText, {
             replace: node => {
-                // change 
                 if (node.name === 'table') {
-
-                    node.attribs.class += ' table table-bordered table-hover table-striped'
-                    return node
-
-
+                    node.attribs.class += ' table table-bordered table-hover table-striped';
+                    return node;
                 }
-                return node
+                // Remove empty p tags
+                if (node.name === 'p' && (!node.children || node.children.length === 0)) {
+                    return null;
+                }
+                return node;
             }
-        })
+        });
     }
 
     return (

@@ -1,5 +1,5 @@
 import { Button, Card, Col, Container, Row, Table } from "react-bootstrap"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { formatDate } from "../services/helper.service"
 
 const SingleOrderView = ({
@@ -7,7 +7,7 @@ const SingleOrderView = ({
     openViewOrderModal,
     openEditOrderModal
 }) => {
-
+    const navigate = useNavigate();
 
 
     return (
@@ -92,7 +92,9 @@ const SingleOrderView = ({
 
 
                     {(!openEditOrderModal && order.paymentStatus == 'NOTPAID') && <Button
-                        onClick={(event) => { }}
+                        onClick={(event) => {
+                            navigate('/payment', { state: order });
+                        }}
                         variant="success" size='sm' className="me-2">Pay to Complete Order</Button>}
 
 

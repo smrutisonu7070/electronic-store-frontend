@@ -17,8 +17,28 @@ export const updateOroder = async (order, orderId) => {
 
 //create create order
 export const createOrder = async (orderDetail) => {
-  const result = await privateAxios.post(`/orders`, orderDetail);
-  return result.data;
+  try {
+    // Validate required fields
+    const requiredFields = ['cartId', 'userId', 'billingAddress', 'billingPhone'];
+    const missingFields = requiredFields.filter(field => !orderDetail[field]);
+    
+    if (missingFields.length > 0) {
+      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+    }
+
+    // Set default values if not provided
+    const orderData = {
+      orderStatus: 'PENDING',
+      paymentStatus: 'NOTPAID',
+      ...orderDetail
+    };
+
+    const result = await privateAxios.post(`/orders`, orderData);
+    return result.data;
+  } catch (error) {
+    console.error('Error creating order:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 //get orders of users
